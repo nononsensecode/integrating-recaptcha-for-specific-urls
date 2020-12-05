@@ -7,6 +7,8 @@ import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.web.servlet.invoke
+import org.springframework.context.support.beans
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
@@ -15,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.security.web.authentication.logout.LogoutFilter
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.filter.CorsFilter
 
 @EnableWebSecurity
 class WebSecurityConfig {
@@ -54,29 +55,29 @@ class WebSecurityConfig {
     @Configuration
     class ReCaptchaConfiguration: WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity?) {
-            http
-                ?.antMatcher("/api/v1/greetings/hello-world")
-                ?.addFilterAfter(RecaptchaValidatingFilter(), LogoutFilter::class.java)
-                ?.authorizeRequests { authorize ->
-                    authorize.anyRequest().permitAll()
-                }?.cors()
+            http {
+                securityMatcher("/api/v1/greetings/hello-world")
+                addFilterAt(RecaptchaValidatingFilter(), LogoutFilter::class.java)
+                authorizeRequests {
+                    authorize(anyRequest, permitAll)
+                }
+                cors {  }
+            }
         }
     }
 
     @Configuration
     class FormLoginConfiguration: WebSecurityConfigurerAdapter() {
         override fun configure(http: HttpSecurity?) {
-            http
-                ?.authorizeRequests { authorize ->
-                    authorize
-                        .antMatchers("/api/v1/greetings/hello-in-spanish")
-                        .hasRole("USER")
-                        .antMatchers("/api/v1/greetings/name/**")
-                        .hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                        .and()
-                        .formLogin()
-                }?.cors()
+            http {
+                authorizeRequests {
+                    authorize("/api/v1/greetings/hello-in-spanish", hasRole("USER"))
+                    authorize("/api/v1/greetings/name/**", hasRole("ADMIN"))
+                    authorize(anyRequest, authenticated)
+                }
+                formLogin {  }
+                cors {  }
+            }
         }
     }
 

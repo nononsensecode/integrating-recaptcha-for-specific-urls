@@ -66,7 +66,6 @@ class RecaptchaValidatingFilter: GenericFilterBean() {
     private fun createRequest(response: String, request: ServletRequest): HttpEntity<LinkedMultiValueMap<String, String>> {
         val params = LinkedMultiValueMap<String, String>()
         val recaptchaProperties = getBean(RecaptchaProperties::class.java, request)
-        logger.info("Secret key is ${recaptchaProperties.secretKey}")
         params.add("secret", recaptchaProperties.secretKey)
         params.add("response", response)
         params.add("remoteip", clientIP(request))
