@@ -1,0 +1,4 @@
+# Please create recaptcha.yml with the below content and theirs original values
+
+recaptcha:
+  secretKey: mySecretKey
