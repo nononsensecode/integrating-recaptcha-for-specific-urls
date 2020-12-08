@@ -1,5 +1,6 @@
 package com.nononsensecode.spring.security.recaptcha
 
+import com.nononsensecode.spring.security.config.PropertyHolder
 import mu.KotlinLogging
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -30,8 +31,9 @@ class RecaptchaValidatingFilter: GenericFilterBean() {
 
             val restTemplate = getBean(RestTemplate::class.java, request)
             val verifyRequest = createRequest(grecaptcha, request)
+            val propertyHolder = getBean(PropertyHolder::class.java, request)
             val verificationResponse = restTemplate
-                .postForObject("https://www.google.com/recaptcha/api/siteverify",
+                .postForObject(propertyHolder.verifyUrl,
                     verifyRequest, ReCaptchaResponse::class.java)!!
             logger.debug(verificationResponse)
 
